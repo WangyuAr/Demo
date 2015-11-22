@@ -1,0 +1,128 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<html>
+<head>
+	<title>找相同图片</title>
+		<script type="text/javascript">
+		var firstIndex=0;
+		var secondIndex=0;
+		var rows=4; var cols=5;
+		var length=rows*cols;
+		var user = new Array();//标记每张图片是否翻开
+		var map = new Array();//标记图片编号的数组
+		var d= new Date();
+		var startHandler;
+		var times,timeb=true;
+		var tmp_color = new Array();
+		var ctr;//点的是否为第一张图片
+		var first;
+		var finished;//标记结束
+		var startFlag=true;
+		for(var i=0;i<length/2;i++){
+			map[i]=i;
+			map[length/2+i]=i;
+			var t=Math.floor(0xFF0000*map[i]/(length/2)).toString(16); 
+			c="#";
+			for(k=t.length;k<6;k++) c+="0";
+				tmp_color[i]=c+t;
+			tmp_color[length/2+i]=c+t;
+		}
+		function $(x){
+			return document.getElementById(x);
+		}
+		function init(){	
+			for( i=0;i<length;i++){
+				 $('img'+i).innerHTML=""
+				 user[i]=0;
+			}
+			map.sort(function(){return Math.random()>.5});
+			ctr=0;
+			finished=0;
+			clearTimeout(startHandler);
+			times=0;
+			$("gametime").innerHTML=GetTimeString(0);
+			startFlag=true;
+			first=parseInt(Math.random()*40+63);
+		}
+		function showimage(but){
+			if(startFlag){
+				timego();
+				startFlag=false;
+			}
+			if (user[but]==1) return;
+			$('img'+but).innerHTML = String.fromCharCode(map[but]+first);
+			$('img'+but).style.color=tmp_color[map[but]];
+			if(ctr==0){
+				ctr++;
+				firstIndex=but;
+			}else{
+				if(firstIndex!=but){
+					secondIndex = but;
+					ctr=0;
+					returntoold();
+				}
+			}
+		}
+		function returntoold(){
+			if(map[firstIndex]==map[secondIndex]){
+				finished++;
+				user[firstIndex]=1;
+				user[secondIndex]=1;
+				ctr=0;
+			}else if(user[firstIndex]==0){
+				$('img'+firstIndex).innerHTML="";
+				firstIndex=secondIndex;
+				secondIndex=0;
+				ctr++;
+			}
+			if(finished>=length/2){
+				clearTimeout(startHandler);
+				if(confirm('恭喜你，你真棒！再玩一局？')==true){
+					init();
+				}
+			}
+		}
+		function timego(){
+			if(timeb==true){
+				$("gametime").innerHTML=GetTimeString(++times);
+				startHandler=setTimeout("timego",1000);
+			}
+		}
+		function GetTimeString(time){
+			d.setHours(0,0,time);
+			return d.toLocaleTimeString();
+		}
+		</script>
+
+</head>
+<body onload="init()">
+	<h2>配对记忆游戏<hr></h2 	
+		<font face="webdings" size="6">
+		<table border="6" bordercolor="#6666ff" bgcolor="#ddffdd" cellspacing="5">
+				<script type="text/javascript">
+				var cols=5;
+				var rows=4;                                  
+ 					for( i=0;i<rows;i++){
+						 mm='<tr>';
+						for( j=0;j<cols;j++){
+							mm+='<td width="32" height="40"';
+							mm+='id="img'+((cols*i)+j)+'" onclick="showimage('+((cols*i)+j)+')">';
+							mm+='</td>';
+						}
+						mm+='</tr>';
+						document.write(mm);
+					}
+				</script>
+		</table>
+</font>
+<table boorder="6" bordercolor="#6666ff" bgcolor="#ddffdd" cellspacing="5" width="222" height="30">
+	<tr>
+		<td>&nbsp;用时:<span id="gametime">0:00:00</span>&nbsp;&nbsp;
+			<input type="button" value="刷新" onclick="init()">
+		</td>
+	</tr>
+		
+
+</table>
+
+</body>
+</html>
